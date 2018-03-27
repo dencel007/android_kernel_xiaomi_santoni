@@ -74,6 +74,10 @@
 #define DEVM_NAME_MAX 30
 #define HOTPLUG_RETRY_INTERVAL_MS 100
 #define UIO_VERSION "1.0"
+#define THERM_DDR_MASTER_ID  1
+#define THERM_DDR_SLAVE_ID   512
+#define THERM_DDR_IB_VOTE_REQ   366000000
+#define INTELLI_USER_FREQ 800000
 
 #define VALIDATE_AND_SET_MASK(_node, _key, _mask, _cpu) \
 	do { \
@@ -146,6 +150,7 @@ static int limit_idx;
 static int limit_idx_low = 8;
 static int limit_idx_high = 20;
 static int intelli_user_control = 1;
+static int intelli_user_freq = INTELLI_USER_FREQ;
 static int max_tsens_num;
 static struct cpufreq_frequency_table *table;
 static uint32_t usefreq;
@@ -998,6 +1003,8 @@ module_param_named(thermal_limit_low, limit_idx_low,
 			int, 0664);
 module_param_named(intelli_user_control, intelli_user_control,
 			int, 0664);
+module_param_named(intelli_user_freq, intelli_user_freq,
+			int, 0664);
 module_param_named(hotplug_temp_hysteresis, msm_thermal_info.hotplug_temp_hysteresis_degC,
 			uint, 0644);
 module_param_named(psm_temp, msm_thermal_info.psm_temp_degC,
@@ -1023,7 +1030,8 @@ static int  msm_thermal_cpufreq_callback(struct notifier_block *nfb,
 			min_freq_req = cpus[policy->cpu].limited_min_freq;
 		}
 
-		if (intelli_user_control > 0)
+		if ((intelli_user_control > 0) &&
+			policy->user_policy.min <= intelli_user_freq)
 			if (max_freq_req < policy->user_policy.min)
 				max_freq_req = policy->user_policy.min;
 
