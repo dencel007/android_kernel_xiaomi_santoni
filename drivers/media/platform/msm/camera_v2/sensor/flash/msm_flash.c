@@ -604,13 +604,18 @@ static int32_t msm_flash_low(
 	return 0;
 }
 
+static bool gpio_flash_low = false;
+static bool gpio_flash_high = false;
 
 static int32_t msm_gpio_flash_low(
 		struct msm_flash_ctrl_t *flash_ctrl,
 		struct msm_flash_cfg_data_t *flash_data)
 {
 	CDBG("Enter\n");
-	gpio_direction_output(93, 1);
+	if (!gpio_flash_low) {
+		gpio_direction_output(93, 1);
+		gpio_flash_low = true;
+	}
 	return 0;
 }
 
@@ -619,7 +624,10 @@ static int32_t msm_gpio_flash_high(
 		struct msm_flash_cfg_data_t *flash_data)
 {
 	CDBG("Enter\n");
-	gpio_direction_output(90, 1);
+	if (!gpio_flash_high) {
+		gpio_direction_output(90, 1);
+		gpio_flash_high = true;
+	}
 	return 0;
 }
 
@@ -628,8 +636,18 @@ static int32_t msm_gpio_flash_off(
 		struct msm_flash_cfg_data_t *flash_data)
 {
 	CDBG("Enter\n");
-	gpio_direction_output(90, 0);
-	gpio_direction_output(93, 0);
+	/* flash low */
+	if (gpio_flash_low) {
+		gpio_direction_output(93, 0);
+		gpio_flash_low = false;
+	}
+
+	/* flash high */
+	if (gpio_flash_high) {
+		gpio_direction_output(90, 0);
+		gpio_flash_high = false;
+	}
+
 	return 0;
 }
 
@@ -651,19 +669,16 @@ int32_t wt_flash_flashlight(bool boolean)
 	}
 
 	if (flash_ctrl_wt)  {
-		CDBG("WT Enter\n");
-
-		CDBG("WT_XJB  flash_ctrl_wt->torch_num_sources = %d", flash_ctrl_wt->torch_num_sources);
 		for (i = 0; i < flash_ctrl_wt->torch_num_sources - 1; i++) {
-			CDBG("WT low_flash_current[%d] = %d\n", i, curr);
-			if (flash_ctrl_wt->torch_trigger[i]) {
-				led_trigger_event(flash_ctrl_wt->torch_trigger[i],
-						curr);
-			}
+			if (flash_ctrl_wt->torch_trigger[i])
+				led_trigger_event(flash_ctrl_wt->torch_trigger[i], curr);
 		}
-		if (flash_ctrl_wt->switch_trigger)
-			led_trigger_event(flash_ctrl_wt->switch_trigger, 1);
-		CDBG("WT Exit\n");
+		if (flash_ctrl_wt->switch_trigger) {
+			if (boolean)
+				led_trigger_event(flash_ctrl_wt->switch_trigger, 1);
+			else
+				led_trigger_event(flash_ctrl_wt->switch_trigger, 0);
+		}
 	}
 	return 0;
 }
