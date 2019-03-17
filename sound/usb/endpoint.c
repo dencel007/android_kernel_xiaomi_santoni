@@ -334,7 +334,7 @@ static void queue_pending_output_urbs(struct snd_usb_endpoint *ep)
 		err = usb_submit_urb(ctx->urb, GFP_ATOMIC);
 		if (err < 0)
 			usb_audio_err(ep->chip,
-				"Unable to submit urb #%d: %d (urb %p)\n",
+				"Unable to submit urb #%d: %d (urb %pK)\n",
 				ctx->index, err, ctx->urb);
 		else
 			set_bit(ctx->index, &ep->active_mask);
@@ -349,6 +349,7 @@ static void snd_complete_urb(struct urb *urb)
 	struct snd_urb_ctx *ctx = urb->context;
 	struct snd_usb_endpoint *ep = ctx->ep;
 	int err;
+
 
 	if (unlikely(urb->status == -ENOENT ||		/* unlinked */
 		     urb->status == -ENODEV ||		/* device removed */
@@ -428,7 +429,7 @@ struct snd_usb_endpoint *snd_usb_add_endpoint(struct snd_usb_audio *chip,
 		    ep->iface == alts->desc.bInterfaceNumber &&
 		    ep->altsetting == alts->desc.bAlternateSetting) {
 			usb_audio_dbg(ep->chip,
-				      "Re-using EP %x in iface %d,%d @%p\n",
+				      "Re-using EP %x in iface %d,%d @%pK\n",
 					ep_num, ep->iface, ep->altsetting, ep);
 			goto __exit_unlock;
 		}

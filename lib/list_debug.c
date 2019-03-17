@@ -10,6 +10,7 @@
 #include <linux/bug.h>
 #include <linux/kernel.h>
 #include <linux/rculist.h>
+#include <linux/bug.h>
 
 /*
  * Check that the data structures for the list manipulations are reasonably
@@ -57,6 +58,5 @@ bool __list_del_entry_valid(struct list_head *entry)
 		return false;
 
 	return true;
-
 }
 EXPORT_SYMBOL(__list_del_entry_valid);

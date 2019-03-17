@@ -2,6 +2,8 @@
 # Makefile for misc devices that really don't fit anywhere else.
 #
 
+obj-y				+= hardware_info.o
+
 obj-$(CONFIG_IBM_ASM)		+= ibmasm/
 obj-$(CONFIG_AD525X_DPOT)	+= ad525x_dpot.o
 obj-$(CONFIG_AD525X_DPOT_I2C)	+= ad525x_dpot-i2c.o
@@ -54,8 +56,22 @@ obj-$(CONFIG_LATTICE_ECP3_CONFIG)	+= lattice-ecp3-config.o
 obj-$(CONFIG_SRAM)		+= sram.o
 obj-y				+= mic/
 obj-$(CONFIG_GENWQE)		+= genwqe/
+obj-$(CONFIG_QSEECOM) += qseecom.o
+obj-$(CONFIG_PROFILER) += profiler.o
+obj-$(CONFIG_HDCP_QSEECOM) += hdcp.o
+ifdef CONFIG_COMPAT
+obj-$(CONFIG_QSEECOM) += compat_qseecom.o
+endif
 obj-$(CONFIG_ECHO)		+= echo/
 obj-$(CONFIG_VEXPRESS_SYSCFG)	+= vexpress-syscfg.o
 obj-$(CONFIG_CXL_BASE)		+= cxl/
+obj-y				+= qcom/
+obj-$(CONFIG_TI_DRV2667) += ti_drv2667.o
+obj-$(CONFIG_USB_EXT_TYPE_C_PERICOM)	+= type-c-pericom.o
+obj-$(CONFIG_USB_EXT_TYPE_C_TI)		+= type-c-ti.o
+obj-$(CONFIG_QPNP_MISC) 	+= qpnp-misc.o
+obj-$(CONFIG_UID_SYS_STATS) += uid_sys_stats.o
+obj-$(CONFIG_MEMORY_STATE_TIME) += memory_state_time.o
+obj-$(CONFIG_APDS9930)		+= apds993x.o
 obj-$(CONFIG_UID_SYS_STATS) += uid_sys_stats.o
 obj-$(CONFIG_MEMORY_STATE_TIME) += memory_state_time.o
